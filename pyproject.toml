@@ -9,7 +9,12 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "djangorestframework (>=3.15.2,<4.0.0)"
+    "django-rest-framework (>=0.1.0,<0.2.0)",
+    "pytest-django (>=4.9.0,<5.0.0)",
+    "faker (>=35.0.0,<36.0.0)",
+    "factory-boy (>=3.3.1,<4.0.0)",
+    "pytest (>=8.3.4,<9.0.0)"
+   
 ]
 
 
