@@ -1,6 +1,10 @@
 import factory
+
 from product.models import Product, Category
 
+# Utilizamos o factory para gerar dados falsos, com propósito de testar
+# a aplicação. Após gerar os dados falsos que preenchem os campos dos
+# models, pode-se testar a migração para o banco de dados.
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):
