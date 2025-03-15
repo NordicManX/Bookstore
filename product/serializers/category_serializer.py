@@ -1,7 +1,5 @@
 from rest_framework import serializers
-
 from product.models.category import Category
-
 
 class CategorySerializer(serializers.ModelSerializer):
     # Como não houve a necessidade de alterar nada, apenas
@@ -15,4 +13,4 @@ class CategorySerializer(serializers.ModelSerializer):
             'description',
             'active'
         ]
-        extra_kwargs = {"slug": {"required": False}}
+        extra_kwargs = {"slug": {"required": False}}  # O campo 'slug' não será obrigatório
