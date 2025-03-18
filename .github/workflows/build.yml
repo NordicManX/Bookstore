@@ -7,12 +7,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.10]  # Versão válida do Python
+        python-version: [3.11]  # Versão 3.11 do Python
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3  # Atualizado para a versão v3 do checkout
+    - uses: actions/checkout@v3  # Versão mais recente do checkout
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -29,7 +29,7 @@ jobs:
       run: poetry --help
 
     - name: Install dependencies
-      run: python -m poetry install  # Sem a necessidade de usar 'shell: bash'
+      run: python -m poetry install
 
     - name: Test
       run: |
