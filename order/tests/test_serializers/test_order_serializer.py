@@ -1,29 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from django.test import TestCase
-from order.factories import OrderFactory
-from product.factories import ProductFactory
+
+from order.factories import OrderFactory, ProductFactory
 from order.serializers import OrderSerializer
+
 
 class TestOrderSerializer(TestCase):
     def setUp(self) -> None:
-        # Criando produtos usando o ProductFactory
-        self.product_1 = ProductFactory()
-        self.product_2 = ProductFactory()
+        self.product_1 = ProductFactory()  # Cria instancia 1 de product
+        self.product_2 = ProductFactory()  # Cria instancia 2 de product
 
-        # Criando a ordem sem a associação direta de produtos
-        self.order = OrderFactory()
-
-        # Associando os produtos à ordem usando .set()
-        self.order.products.set([self.product_1, self.product_2])
-        
-        # Inicializando o serializer da ordem
-        self.order_serializer = OrderSerializer(self.order)
+        self.order = OrderFactory(
+            product=(self.product_1, self.product_2)
+        )  # Cria uma instancia de order que inclui os 2 products criados
+        self.order_serializer = OrderSerializer(self.order)  # Serializa o objeto order
 
     def test_order_serializer(self):
-        # Testando os dados serializados
-        serializer_data = self.order_serializer.data
-        self.assertEqual(
-            serializer_data["products"][0]["title"], self.product_1.title
-        )
-        self.assertEqual(
-            serializer_data["products"][1]["title"], self.product_2.title
-        )
+        serializer_data = self.order_serializer.data  # Armazena os dados serializados
+        self.assertEquals(serializer_data["product"][0]["title"], self.product_1.title)
+        self.assertEquals(serializer_data["product"][1]["title"], self.product_2.title)
+        # Verificam se os títulos das listas serializadas batem com os títulos dos objetos

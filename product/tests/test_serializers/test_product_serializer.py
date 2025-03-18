@@ -4,25 +4,28 @@ from product.factories import CategoryFactory, ProductFactory
 from product.serializers import ProductSerializer
 
 
+# Criando categoria, instancia (produto)
+# e testando a serialização do objeto
 class TestProductSerializer(TestCase):
     def setUp(self) -> None:
-        # Criando a categoria
-        self.category = CategoryFactory(title="technology")
-
-        # Criando o produto
-        self.product_1 = ProductFactory(title="mouse", price=100)
-
-        # Associando a categoria ao produto
-        self.product_1.category.set([self.category])
-
-        # Inicializando o serializer do produto
-        self.product_serializer = ProductSerializer(self.product_1)
+        self.category = CategoryFactory(title="language learning")  # Cria uma categoria
+        self.product_1 = ProductFactory(
+            title="german travel guide",
+            price=55,
+            category=[self.category],  # Cria uma instancia
+        )
+        self.product_serializer = ProductSerializer(
+            self.product_1
+        )  # Serializa o objeto
 
     def test_product_serializer(self):
-        # Testando os dados serializados
         serializer_data = self.product_serializer.data
-        self.assertEqual(serializer_data["price"], 100)
-        self.assertEqual(serializer_data["title"], "mouse")
-        self.assertEqual(
-            serializer_data["category"][0]["title"], "technology"
-        )
+        self.assertEquals(
+            serializer_data["price"], 55
+        )  # Verifica se o preço retornado pelo serializer é 55
+        self.assertEquals(
+            serializer_data["title"], "german travel guide"
+        )  # Verifica se o preço retornado pelo serializer é german travel guide
+        self.assertEquals(
+            serializer_data["category"][0]["title"], "language learning"
+        )  # Verifica se título da primeira categoria na lista category é language learning
