@@ -4,15 +4,20 @@ on: [push]
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.x]  # Usando a versão mais recente da linha Python 3.x
+
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 'latest'  # Usando a versão mais recente do Python
+        python-version: ${{ matrix.python-version }}
 
     - name: Install poetry
       run: |
@@ -20,16 +25,13 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install --upgrade poetry
 
-    - name: Check poetry version
-      run: poetry --version
+    - name: View poetry --help
+      run: poetry --help
 
     - name: Install dependencies
       shell: bash
       run: poetry install
 
-    - name: Check dependencies
-      run: poetry show
-
-    - name: Run tests
+    - name: Test
       run: |
-        poetry run python manage.py test --verbosity=2
+        poetry run python manage.py test
