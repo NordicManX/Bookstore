@@ -1,36 +1,61 @@
-name: Python application
+name: Build and Test Django Application with Docker
 
-on: [push]
+on:
+  push:
+    branches:
+      - main  # Ou a branch que você está utilizando para deploy
+  pull_request:
+    branches:
+      - main  # Ou a branch que você está utilizando para deploy
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.11]  # Versão 3.11 do Python
-
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v3  # Versão mais recente do checkout
+    services:
+      postgres:
+        image: postgres:13.0-alpine
+        ports:
+          - 5433:5432  # Mapeando a porta do PostgreSQL para a máquina local
+        env:
+          POSTGRES_USER: bookstore_dev
+          POSTGRES_PASSWORD: bookstore_dev
+          POSTGRES_DB: bookstore_dev_db
+        options: --health-cmd="pg_isready -U bookstore_dev" --health-interval=5s --health-timeout=5s --health-retries=3
 
-    - name: Set up Python ${{ matrix.python-version }}
+    steps:
+    # Passo 1: Fazer checkout do código
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Passo 2: Configurar Docker Compose para iniciar os containers
+    - name: Set up Docker Compose
+      run: |
+        docker-compose -f docker-compose.yml up -d  # Levanta os containers em segundo plano
+
+    # Passo 3: Configurar Python (usando uma matriz de versões se necessário)
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.9  # Use a versão que preferir
 
-    - name: Install poetry
+    # Passo 4: Instalar dependências com o Poetry
+    - name: Install Poetry
       run: |
         python -m ensurepip
         python -m pip install --upgrade pip
         python -m pip install --upgrade poetry
 
-    - name: View poetry --help
-      run: poetry --help
-
     - name: Install dependencies
-      run: python -m poetry install
-
-    - name: Test
       run: |
-        poetry run python manage.py test
+        poetry install  # Instala as dependências listadas no pyproject.toml
+
+    # Passo 5: Executar os testes
+    - name: Run tests
+      run: |
+        poetry run python manage.py test  # Executa os testes do Django
+
+    # Passo 6: Desligar os containers após os testes
+    - name: Tear down Docker Compose
+      run: |
+        docker-compose down  # Desliga os containers após o término dos testes
