@@ -1,61 +1,64 @@
-name: Build and Test Django Application with Docker
+name: Python application
 
-on:
-  push:
-    branches:
-      - main  # Ou a branch que você está utilizando para deploy
-  pull_request:
-    branches:
-      - main  # Ou a branch que você está utilizando para deploy
+on: [push]
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.12]
+
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: postgres:13.0-alpine
+      db:
+        image: postgres:13
         ports:
-          - 5433:5432  # Mapeando a porta do PostgreSQL para a máquina local
+          - 5434:5432
         env:
           POSTGRES_USER: bookstore_dev
           POSTGRES_PASSWORD: bookstore_dev
           POSTGRES_DB: bookstore_dev_db
-        options: --health-cmd="pg_isready -U bookstore_dev" --health-interval=5s --health-timeout=5s --health-retries=3
+        # Wait for PostgreSQL to be ready before proceeding
+        options: >-
+          --health-cmd="pg_isready -U bookstore_dev" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
 
     steps:
-    # Passo 1: Fazer checkout do código
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    # Passo 2: Configurar Docker Compose para iniciar os containers
-    - name: Set up Docker Compose
-      run: |
-        docker-compose -f docker-compose.yml up -d  # Levanta os containers em segundo plano
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    # Passo 3: Configurar Python (usando uma matriz de versões se necessário)
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9  # Use a versão que preferir
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
-    # Passo 4: Instalar dependências com o Poetry
-    - name: Install Poetry
-      run: |
-        python -m ensurepip
-        python -m pip install --upgrade pip
-        python -m pip install --upgrade poetry
+      - name: Install poetry
+        run: |
+          python -m ensurepip
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade poetry
 
-    - name: Install dependencies
-      run: |
-        poetry install  # Instala as dependências listadas no pyproject.toml
+      - name: Install dependencies
+        shell: bash
+        run: poetry install
 
-    # Passo 5: Executar os testes
-    - name: Run tests
-      run: |
-        poetry run python manage.py test  # Executa os testes do Django
+      - name: Start Docker Compose services
+        run: docker-compose up -d --build
 
-    # Passo 6: Desligar os containers após os testes
-    - name: Tear down Docker Compose
-      run: |
-        docker-compose down  # Desliga os containers após o término dos testes
+      - name: Wait for database to be ready
+        run: |
+          until docker-compose exec -T db pg_isready -U bookstore_dev; do
+            echo "Waiting for database to be ready..."
+            sleep 5
+          done
+
+      - name: Run Tests
+        run: docker-compose exec -T web python manage.py test
