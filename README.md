@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> code-workflow
 # Bookstore
 
 Bookstore APP from Backend Python course from EBAC
@@ -45,7 +48,11 @@ https://github.com/NordicManX/Bookstore.git
 
    ```shell
    docker-compose exec web python manage.py test
+<<<<<<< HEAD
    ```
 =======
 # Bookstore
 >>>>>>> Project-with-error
+=======
+   ```
+>>>>>>> code-workflow
