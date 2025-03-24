@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Bookstore
 
 Bookstore APP from Backend Python course from EBAC
@@ -45,3 +46,6 @@ https://github.com/NordicManX/Bookstore.git
    ```shell
    docker-compose exec web python manage.py test
    ```
+=======
+# Bookstore
+>>>>>>> Project-with-error
