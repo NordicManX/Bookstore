@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-03uk8#4d8)cfx^t$l#cr0z50^8*b$bpbu-nf%*jm2hhskf(gfb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'bookstore-api-test-83dc14e58584.herokuapp.com']
 
 
 # Application definition
@@ -153,10 +153,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-DEBUG = int(os.environ.get("DEBUG", default=0))
-
-# 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
-# For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
-ALLOWED_HOSTS = ['localhost', '27.0.0.1', 'bookstore-api-test-83dc14e58584.herokuapp.com']
+STATIC_ROOT = BASE_DIR / "staticfiles"
