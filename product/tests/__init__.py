@@ -1,0 +1,1 @@
+from product.tests.test_viewsets.test_product_viewset import TestProductViewSet
